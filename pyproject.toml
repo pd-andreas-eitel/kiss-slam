@@ -37,8 +37,8 @@ classifiers = [
 ]
 dependencies = [
     "kiss-icp>=1.2.3",
-    "map_closures>=2.0.2",
     "open3d>=0.19.0",
+    "map_closures @ git+https://github.com/PRBonn/MapClosures.git@main#egg=map_closures&subdirectory=python",
     "numpy",
     "PyYAML",
     "pydantic>=2",
