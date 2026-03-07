@@ -36,10 +36,10 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
+    "numpy>=2.1.3",
     "kiss-icp>=1.2.3",
     "open3d>=0.19.0",
-    "map_closures @ git+https://github.com/PRBonn/MapClosures.git@main#egg=map_closures&subdirectory=python",
-    "numpy",
+    "map-closures>=2.0.2",
     "PyYAML",
     "pydantic>=2",
     "tqdm",
