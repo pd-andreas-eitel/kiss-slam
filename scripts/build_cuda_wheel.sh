@@ -6,6 +6,11 @@ WORK_DIR=$(mktemp -d)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+# Detect CUDA version (e.g. "12.4" -> "cu124")
+CUDA_VERSION=$(nvcc --version | grep -oP 'release \K[0-9]+\.[0-9]+')
+CUDA_TAG="cu$(echo "${CUDA_VERSION}" | tr -d '.')"
+echo "=== Detected CUDA ${CUDA_VERSION} (${CUDA_TAG}) ==="
+
 cleanup() {
     rm -rf "${WORK_DIR}"
 }
@@ -26,11 +31,19 @@ pixi run -m "${PROJECT_DIR}" pip wheel "${PROJECT_DIR}" \
 echo "=== Copying map-closures wheel to dist/ ==="
 cp "${WORK_DIR}/wheels"/map_closures*.whl "${PROJECT_DIR}/dist/"
 
+echo "=== Renaming wheels to include CUDA version ==="
+for whl in "${PROJECT_DIR}"/dist/*.whl; do
+    new_name=$(basename "${whl}" | sed "s/\(-[0-9][0-9.]*\)-/\1+${CUDA_TAG}-/")
+    if [ "$(basename "${whl}")" != "${new_name}" ]; then
+        mv "${whl}" "${PROJECT_DIR}/dist/${new_name}"
+    fi
+done
+
 echo "=== Done ==="
 ls -la "${PROJECT_DIR}/dist/"
 
 cd "${PROJECT_DIR}"
 echo "=== Uploading wheels ==="
 pixi run twine upload --repository-url https://pypi.internal.paralleldomain.com/ --username "" --password "" \
-    "dist/kiss_slam-0.0.2-cp311-cp311-linux_x86_64.whl" \
-    "dist/map_closures-2.0.2-cp311-cp311-linux_x86_64.whl"
+    dist/kiss_slam-*+${CUDA_TAG}-*.whl \
+    dist/map_closures-*+${CUDA_TAG}-*.whl

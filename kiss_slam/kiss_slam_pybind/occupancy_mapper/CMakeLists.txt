@@ -24,3 +24,5 @@ add_library(occupancy_mapper STATIC occupancy_mapper.cpp)
 target_link_libraries(occupancy_mapper PUBLIC Eigen3::Eigen bonxai_core)
 target_include_directories(occupancy_mapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PUBLIC ${PROJECT_SOURCE_DIR})
 set_global_target_properties(occupancy_mapper)
+# Suppress false-positive maybe-uninitialized warnings from Bonxai headers with GCC 14+
+target_compile_options(occupancy_mapper PRIVATE $<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wno-maybe-uninitialized>)
